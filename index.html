@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geolocation Example</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    #location {
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Geolocation Example</h1>
+  <p>Click the button below to get your current location.</p>
+  <button onclick="getLocation()">Get Location</button>
+
+  <div id="location">
+    <p id="latitude"></p>
+    <p id="longitude"></p>
+  </div>
+
+  <script>
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          // Display latitude and longitude on the webpage
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
+          document.getElementById("latitude").textContent = "Latitude: " + latitude;
+          document.getElementById("longitude").textContent = "Longitude: " + longitude;
+
+          // Send the data to the Vercel serverless function
+          sendLocationToBackend(latitude, longitude);
+        }, function(error) {
+          // Handle errors (e.g., permission denied or location unavailable)
+          alert("Error: " + error.message);
+        });
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    }
+
+    function sendLocationToBackend(latitude, longitude) {
+      // Replace this URL with the actual URL of your Vercel project
+      const apiUrl = '/api/location';  // Vercel automatically handles this path
+      
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ latitude, longitude })
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Server response:', data);
+        alert('Location sent successfully!');
+      })
+      .catch(error => {
+        console.error('Error sending location:', error);
+        alert('Error sending location');
+      });
+    }
+  </script>
+</body>
+</html>
